@@ -1,0 +1,5 @@
+# Naptime
+
+A collection of small programs made during my daughter's naptime.
+
+Heavily inspired by Handmade Hero and Ray Tracing in a Weekend.
