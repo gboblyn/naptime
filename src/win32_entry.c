@@ -8,28 +8,38 @@
 #define IMAGE_WIDTH 800
 #define IMAGE_HEIGHT 600
 
+// TODO: move these globals
+HBITMAP dibHandle;
+HDC device;
+void **bitmap;
+
 void resizeDIBSection(int width, int height) {
-	HDC device = CreateCompatibleDC(NULL);
+	if (!device) {
+		device = CreateCompatibleDC(NULL);
+	}
 
 	BITMAPINFO bitmapInfo = {
 		.bmiHeader = {
-			.biSize = sizeof(bitmapInfo.bmiHeader);
-			.biWidth = width;
-			.biHeight = height;
-			.biPlanes = 1;
-			.biBitCout = 32;
-			.biCompression = BI_RGB;
-			.biSizeImage = 0;
-			.biXPelsPerMeter = 0;
-			.biYPelsPerMeter = 0;
-			.biClrUsed = 0;
-			.biClrImportant = 0;
-		},
-		REGQUAD = NULL
+			.biSize = sizeof(bitmapInfo.bmiHeader),
+			.biWidth = width,
+			.biHeight = height,
+			.biPlanes = 1,
+			.biBitCount = 32,
+			.biCompression = BI_RGB,
+			.biSizeImage = 0,
+			.biXPelsPerMeter = 0,
+			.biYPelsPerMeter = 0,
+			.biClrUsed = 0,
+			.biClrImportant = 0
+		}
 	};
 
-	void **bitmap;
-	HBITMAP dibHandle = CreateDIBSection(device, bitmapInfo, DIB_RGB_COLORS, bitmap, NULL, 0);
+	if (dibHandle) {
+		DeleteObject(dibHandle);
+	}
+	
+	dibHandle = CreateDIBSection(device, &bitmapInfo, DIB_RGB_COLORS,
+			bitmap, NULL, 0);
 }
 
 LRESULT windowCallback(HWND window, UINT message,
@@ -39,6 +49,8 @@ LRESULT windowCallback(HWND window, UINT message,
 	switch(message) {
 		case WM_CLOSE:
 		case WM_DESTROY:
+			// TODO: probably not the place for cleanup
+			DeleteDC(device);
 			DestroyWindow(window);
 			break;
 		case WM_SIZE:
@@ -54,10 +66,10 @@ LRESULT windowCallback(HWND window, UINT message,
 		case WM_PAINT:
 			PAINTSTRUCT ps;
 			hdc = BeginPaint(window, &ps);
-			int x = ps.rcPaint.left;
-			int y = ps.rcPaint.right;
-			int width = ps.rcPaint.right - ps.rcPaint.left;
-			int height = ps.rcPaint.bottom - ps.rcPaint.top;
+			// int x = ps.rcPaint.left;
+			// int y = ps.rcPaint.right;
+			// int width = ps.rcPaint.right - ps.rcPaint.left;
+			// int height = ps.rcPaint.bottom - ps.rcPaint.top;
 
 			// StretchDIBits(hdc, x, y, width, height, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT,
 			//     bits, bitmap, DIB_RGB_COLORS, );
